@@ -1,10 +1,11 @@
 .DEFAULT_GOAL := build
 .PHONY: fmt vet build
 
+include .env
 export
 
 MIGRATIONS_PATH=./migrations
-DSN=postgres://postgres:postgres@127.0.0.1:54323/idm?sslmode=disable
+DSN=$(DB_CONNECTION)://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable
 
 test:
 	go test ./...
