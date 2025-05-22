@@ -1,0 +1,21 @@
+services:
+  postgres-db:
+    image: postgres:17.2-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: idm
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - export:/export
+    ports:
+      - "127.0.0.1:54323:5432"
+    networks:
+      - idm_network
+
+volumes:
+  pg-data:
+  export:
+
+networks:
+  idm_network:
