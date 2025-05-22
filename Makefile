@@ -16,7 +16,7 @@ vet: fmt
 	go vet ./...
 
 build: vet
-	go build
+	go build -o ./bin/idm ./cmd
 
 up:
 	docker compose -f ./docker/docker-compose.yml up -d
