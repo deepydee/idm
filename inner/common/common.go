@@ -3,7 +3,6 @@ package common
 import (
 	"fmt"
 	"github.com/joho/godotenv"
-	"log"
 	"os"
 )
 
@@ -15,10 +14,7 @@ type Config struct {
 
 // GetConfig получение конфигурации из .env файла или переменных окружения
 func GetConfig(envFile string) Config {
-	err := godotenv.Load(envFile)
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	_ = godotenv.Load(envFile)
 
 	dsn := fmt.Sprintf(
 		"%s://%s:%s@%s:%s/%s?sslmode=disable",
