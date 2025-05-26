@@ -57,9 +57,15 @@ func (r *Repository) Create(role *Role) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	_, err := r.db.ExecContext(ctx, "INSERT INTO roles (name) VALUES ($1)", role.Name)
+	err := r.db.QueryRowContext(ctx,
+		"INSERT INTO roles (name) VALUES ($1) RETURNING id",
+		role.Name).Scan(&role.Id)
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *Repository) Remove(id int64) error {
