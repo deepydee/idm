@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"idm/inner/common"
@@ -8,6 +9,10 @@ import (
 )
 
 var DB *sqlx.DB
+
+var (
+	ErrRecordNotFound = errors.New("record not found")
+)
 
 // ConnectDb получить конфиг и подключиться с ним к базе данных
 func ConnectDb() *sqlx.DB {

@@ -7,10 +7,16 @@ export
 MIGRATIONS_PATH=./migrations
 DSN=$(DB_CONNECTION)://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable
 
-test:
-	go test ./...
+test-integration:
+	@export $(shell cat tests/.env | xargs); \
+	DSN=$${DB_CONNECTION}://$${DB_USER}:$${DB_PASSWORD}@$${DB_HOST}:$${DB_PORT}/$${DB_NAME}?sslmode=disable; \
+	migrate -path=$(MIGRATIONS_PATH) -database="$$DSN" up; \
+	DSN="$$DSN" go test -v ./tests/...
 
-fmt: test
+test-inner:
+	go test ./inner/...
+
+fmt: test-inner
 	go fmt ./...
 
 vet: fmt
@@ -20,7 +26,7 @@ build: vet
 	go build -o ./bin/idm ./cmd
 
 up:
-	docker compose -f ./docker/docker-compose.yml up -d
+	docker compose -f ./docker/docker-compose.yml up -d --build
 
 down:
 	docker compose -f ./docker/docker-compose.yml down
