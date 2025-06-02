@@ -6,7 +6,8 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: idm
     volumes:
-      - pg-data:/var/lib/postgresql/data
+      - idm_pg-data:/var/lib/postgresql/data
+      - ./sql/init:/docker-entrypoint-initdb.d
       - export:/export
     ports:
       - "127.0.0.1:54323:5432"
@@ -14,7 +15,7 @@ services:
       - idm_network
 
 volumes:
-  pg-data:
+  idm_pg-data:
   export:
 
 networks:
