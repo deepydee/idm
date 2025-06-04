@@ -284,3 +284,66 @@ func TestEmployeeService(t *testing.T) {
 		assert.True(repo.AssertNumberOfCalls(t, "RemoveByIds", 1))
 	})
 }
+
+func TestService_Create(t *testing.T) {
+	assert := assertpackage.New(t)
+
+	t.Run("unable to begin transaction", func(t *testing.T) {
+		repo := &MockRepo{}
+		service := NewService(repo)
+		baseError := errors.New("error creating transaction")
+		repo.On("Create", &Employee{Name: "John Doe"}).Return(baseError)
+		_, err := service.Create("John Doe")
+
+		assert.Error(err)
+		assert.Contains(err.Error(), "error creating transaction")
+		assert.True(errors.Is(err, baseError))
+	})
+
+	t.Run("error checking employee exists", func(t *testing.T) {
+		repo := &MockRepo{}
+		service := NewService(repo)
+		baseError := errors.New("error checking employee exists")
+		repo.On("Create", &Employee{Name: "John Doe"}).Return(baseError)
+		_, err := service.Create("John Doe")
+
+		assert.Error(err)
+		assert.Contains(err.Error(), "error checking employee exists")
+		assert.True(errors.Is(err, baseError))
+	})
+
+	t.Run("employee already exists", func(t *testing.T) {
+		repo := &MockRepo{}
+		service := NewService(repo)
+		baseError := errors.New("employee already exists")
+		repo.On("Create", &Employee{Name: "John Doe"}).Return(baseError)
+		_, err := service.Create("John Doe")
+
+		assert.Error(err)
+		assert.Contains(err.Error(), "employee already exists")
+		assert.True(errors.Is(err, baseError))
+	})
+
+	t.Run("error creating employee", func(t *testing.T) {
+		repo := &MockRepo{}
+		service := NewService(repo)
+		baseError := errors.New("error creating employee")
+		repo.On("Create", &Employee{Name: "John Doe"}).Return(baseError)
+		_, err := service.Create("John Doe")
+
+		assert.Error(err)
+		assert.Contains(err.Error(), "error creating employee")
+		assert.True(errors.Is(err, baseError))
+	})
+
+	t.Run("successful employee creation", func(t *testing.T) {
+		repo := &MockRepo{}
+		service := NewService(repo)
+		repo.On("Create", mock.AnythingOfType("*employee.Employee")).Return(nil)
+		got, err := service.Create("John")
+
+		assert.Nil(err)
+		assert.NotNil(got)
+		assert.Equal("John", got.Name)
+	})
+}
