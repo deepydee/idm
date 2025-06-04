@@ -1,10 +1,14 @@
 package employee
 
 import (
+	"github.com/78bits/go-sqlmock-sqlx"
 	assertpackage "github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"idm/inner/database"
 	"idm/inner/employee"
+	"regexp"
 	"testing"
+	"time"
 )
 
 func TestEmployeeRepository(t *testing.T) {
@@ -161,4 +165,29 @@ func TestEmployeeRepository(t *testing.T) {
 
 		clearDb()
 	})
+}
+
+func TestRepository_Create(t *testing.T) {
+	db, mock, err := sqlmock.Newx()
+	require.NoError(t, err)
+	defer db.Close()
+
+	r := employee.NewRepository(db)
+
+	mock.ExpectBegin()
+	mock.ExpectQuery("SELECT COUNT\\(\\*\\) FROM employees WHERE name = \\$1").
+		WithArgs("John Doe").
+		WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(0))
+	mock.ExpectQuery(regexp.QuoteMeta(
+		"INSERT INTO employees (name) VALUES ($1) RETURNING id, created_at, updated_at")).
+		WithArgs("John Doe").
+		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at"}).AddRow(1, time.Now(), time.Now()))
+	mock.ExpectCommit()
+
+	err = r.Create(&employee.Employee{Name: "John Doe"})
+	require.NoError(t, err)
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
 }

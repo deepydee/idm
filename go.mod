@@ -3,6 +3,7 @@ module idm
 go 1.24.3
 
 require (
+	github.com/78bits/go-sqlmock-sqlx v1.5.4
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
